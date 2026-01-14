@@ -1,0 +1,577 @@
+{
+  "name": "007-MOD TAG CHATWOOT",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.phyonex.com/api/v1/accounts/5/contacts/{{ $json.contact_id }}/labels",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "bh6bkHDtJGRJoYxHGrwmjC14"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('VarGlobal').item.json.json_content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1184,
+        -320
+      ],
+      "id": "106e26fb-93f1-41da-8c02-d7a65c60b036",
+      "name": "TagPost"
+    },
+    {
+      "parameters": {
+        "url": "=https://chat.phyonex.com/api/v1/accounts/5/contacts/search?q={{ $('VarGlobal').item.json.remoteJid }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "bh6bkHDtJGRJoYxHGrwmjC14"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        96,
+        32
+      ],
+      "id": "351adbbf-6813-4a8d-8935-9bbb0972e2f0",
+      "name": "TagGet_contact_id"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "id_cliente"
+            },
+            {
+              "name": "remoteJid"
+            },
+            {
+              "name": "customer_phone_mobile",
+              "type": "number"
+            },
+            {
+              "name": "id_customer",
+              "type": "number"
+            },
+            {
+              "name": "data_customer",
+              "type": "object"
+            },
+            {
+              "name": "json_content"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -896,
+        16
+      ],
+      "id": "04cef561-b9bb-48f1-9c14-b1dedd424ec5",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f71b1272-bf0f-40f1-8943-dc9987a589a1",
+              "name": "id_cliente",
+              "value": "={{ $('When Executed by Another Workflow').item.json.id_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "50a7eb8c-3732-4c3d-86a3-a4dd933b77c6",
+              "name": "remoteJid",
+              "value": "=5519992496598",
+              "type": "string"
+            },
+            {
+              "id": "05d3f247-13df-4044-a9a2-bf52af4e1108",
+              "name": "customer_phone_mobile",
+              "value": "={{ $('When Executed by Another Workflow').item.json.customer_phone_mobile }}",
+              "type": "number"
+            },
+            {
+              "id": "892e06f1-9dc8-4c04-860c-30c9c3a444c9",
+              "name": "id_customer",
+              "value": "={{ $('When Executed by Another Workflow').item.json.id_customer }}",
+              "type": "number"
+            },
+            {
+              "id": "8ed5f078-51fc-4b32-bfc7-8377817accf2",
+              "name": "data_customer",
+              "value": "={{ $('When Executed by Another Workflow').item.json.data_customer }}",
+              "type": "object"
+            },
+            {
+              "id": "0cf56cf0-fe06-4cf6-b8cd-33e3fc6444c3",
+              "name": "json_content",
+              "value": "={{ $json.json_content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        16
+      ],
+      "id": "f228f179-7133-4d22-8c8b-17abb7055fc3",
+      "name": "VarGlobal"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "91237333-89aa-41b3-aa4a-271030e8fe96",
+              "leftValue": "={{ $json.payload[0].id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "2843c082-d9cd-4815-b1ad-57234b3105c9",
+              "leftValue": "={{ $json.payload[0].id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        32
+      ],
+      "id": "03c5eb58-ac01-46d1-b209-745d38ab0ca4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('VarGlobal').item.json.remoteJid }}_id_customer_{{ $('VarGlobal').item.json.id_customer }}",
+        "value": "={{ $json.payload[0].id }}",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 259200
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        528,
+        16
+      ],
+      "id": "306c5b56-7a60-42e1-853c-2d77b399ed95",
+      "name": "SetContact_ID_Chatwoot",
+      "credentials": {
+        "redis": {
+          "id": "zJTlOiAtaJNhA6Uh",
+          "name": "Redis_n8n_local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "79426ada-b56e-429c-b8ad-06483695d190",
+              "name": "contact_id",
+              "value": "={{ $('TagGet_contact_id').item.json.payload[0].id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        16
+      ],
+      "id": "e778fb5b-8e60-413b-b715-1e71e9d2754a",
+      "name": "Contact_ID"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "contact_id",
+        "key": "={{ $('VarGlobal').item.json.remoteJid }}_id_customer_{{ $('VarGlobal').item.json.id_customer }}",
+        "keyType": "string",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        16
+      ],
+      "id": "3d092ef8-fb92-4d71-9f16-3d16661c5d1e",
+      "name": "Verificar chave1",
+      "credentials": {
+        "redis": {
+          "id": "zJTlOiAtaJNhA6Uh",
+          "name": "Redis_n8n_local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "90193aef-9b32-4159-ac1b-a8d3efd06cb5",
+              "leftValue": "={{ $json.contact_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "3932b4ea-e8ec-4464-b992-c22fa53847be",
+              "leftValue": "={{ $json.contact_id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        16
+      ],
+      "id": "bfed014e-c496-47e6-b25f-105e82212490",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "79426ada-b56e-429c-b8ad-06483695d190",
+              "name": "contact_id",
+              "value": "={{ $json.contact_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        96,
+        -320
+      ],
+      "id": "4278c98a-9c0b-49a0-9132-e17f243fc064",
+      "name": "Contact_ID1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "88728dbb-0be0-4241-b8bf-e265bb3ae012",
+              "name": "contact_id",
+              "value": "={{ $json.contact_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        -320
+      ],
+      "id": "7f1fb893-ffc8-4d02-9f8b-5266536cea49",
+      "name": "Contact_ID_Adjust"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "5519992496598_id_customer_1"
+      },
+      "id": "d8863b60-d74d-402c-8625-14bdf203e767",
+      "name": "RedisDeleteBlockHumano",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        512
+      ],
+      "credentials": {
+        "redis": {
+          "id": "zJTlOiAtaJNhA6Uh",
+          "name": "Redis_n8n_local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://chat.phyonex.com/api/v1/accounts/5/contacts/search?q=5519992496598",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "bh6bkHDtJGRJoYxHGrwmjC14"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -192,
+        512
+      ],
+      "id": "cbc7afe5-e155-4354-a352-abed1bf224e6",
+      "name": "TagGet_contact_id1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.phyonex.com/api/v1/accounts/5/contacts/{{ $('TagGet_contact_id1').item.json.payload[0].id }}/labels",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "bh6bkHDtJGRJoYxHGrwmjC14"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"teste\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        64,
+        512
+      ],
+      "id": "d3bfa6f7-6386-4029-b528-f73ce512f61d",
+      "name": "TagPost1",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "VarGlobal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VarGlobal": {
+      "main": [
+        [
+          {
+            "node": "Verificar chave1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "SetContact_ID_Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TagGet_contact_id": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SetContact_ID_Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "Contact_ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TagPost": {
+      "main": [
+        []
+      ]
+    },
+    "Contact_ID": {
+      "main": [
+        [
+          {
+            "node": "Contact_ID_Adjust",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar chave1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Contact_ID1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TagGet_contact_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact_ID1": {
+      "main": [
+        [
+          {
+            "node": "Contact_ID_Adjust",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact_ID_Adjust": {
+      "main": [
+        [
+          {
+            "node": "TagPost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "98404bf4-78f8-4b85-9e1a-7523325b0cde",
+  "meta": {
+    "instanceId": "597adaec4688578e9a5a915f3460fb4449a7b5d29fb99ae1145ffd17ea295eb1"
+  },
+  "id": "GvR2SUW9xFOsMb14",
+  "tags": [
+    {
+      "updatedAt": "2025-09-03T00:03:42.227Z",
+      "createdAt": "2025-09-03T00:03:42.227Z",
+      "id": "4rti6Kt4elQI0E8M",
+      "name": "IMPLANTAÇÃO"
+    }
+  ]
+}
