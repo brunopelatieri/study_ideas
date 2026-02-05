@@ -10,7 +10,7 @@
           "parameters": [
             {
               "name": "api_access_token",
-              "value": "bh6bkHDtJGRJoYxHGrwmjC14"
+              "value": "YOUR_API_CHATWOOT_KEY"
             },
             {
               "name": "Content-Type",
@@ -40,7 +40,7 @@
           "parameters": [
             {
               "name": "api_access_token",
-              "value": "bh6bkHDtJGRJoYxHGrwmjC14"
+              "value": "YOUR_API_CHATWOOT_KEY"
             },
             {
               "name": "Content-Type",
@@ -380,7 +380,7 @@
           "parameters": [
             {
               "name": "api_access_token",
-              "value": "bh6bkHDtJGRJoYxHGrwmjC14"
+              "value": "YOUR_API_CHATWOOT_KEY"
             },
             {
               "name": "Content-Type",
@@ -408,7 +408,7 @@
           "parameters": [
             {
               "name": "api_access_token",
-              "value": "bh6bkHDtJGRJoYxHGrwmjC14"
+              "value": "YOUR_API_CHATWOOT_KEY"
             },
             {
               "name": "Content-Type",
