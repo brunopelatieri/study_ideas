@@ -95,6 +95,12 @@ docker service logs bmcp_smcp -f
 
 ---
 
+```bash
+docker service logs mcp-bru_app --no-trunc --tail 20 2>&1
+```
+
+---
+
 ## ⚙️ Execução Manual com Variáveis
 
 ```bash
