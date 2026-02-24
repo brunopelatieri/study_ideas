@@ -1,37 +1,37 @@
-# 🏢 n8n JavaScript Expressions – Enterprise Guide
-_Advanced Enterprise Reference & Comparative Expression Table_
+# 🏢 n8n JavaScript Expressions – Fast + Enterprise Unified Guide
+_Advanced Quick Reference + Enterprise Governance Pattern_
 
 ---
 
-## 🇧🇷 Visão Geral
+## 📌 Documento Consolidado
 
-Este documento é a versão **Enterprise** do guia de expressões JavaScript para n8n.
-Ele foi estruturado para:
+Este guia consolida:
 
-- Padronização interna de times
-- Documentação corporativa
-- Onboarding técnico
-- Consulta rápida (cheatsheet avançado)
-- Governança de automações
+- Guia Enterprise de Expressões
+- Guia Técnico de Datas e Timestamps
+- Concatenação e manipulação avançada
+
+Agora estruturado no padrão oficial de documentação técnica.
 
 ---
 
-## 🇺🇸 Overview
+# 🇧🇷 Visão Geral
 
-This is the **Enterprise Edition** of the JavaScript expressions guide for n8n.
-Designed for:
+Este documento reúne:
 
-- Internal standardization
-- Corporate documentation
-- Technical onboarding
-- Quick reference
-- Automation governance
+- Expressões rápidas para uso diário
+- Concatenação avançada entre nodes
+- Manipulação segura de strings e arrays
+- Datas e timestamps (modelo Pareto 80/20)
+- Padrões Enterprise de governança
+- Anti‑patterns críticos
+- Cheatsheet de produção
 
 ---
 
 # 🔎 Fundamentos das Expressões no n8n
 
-No n8n, expressões são escritas dentro de:
+Expressões são escritas dentro de:
 
 ```handlebars
 {{ ... }}
@@ -39,29 +39,32 @@ No n8n, expressões são escritas dentro de:
 
 Permitem:
 
-- Acessar dados do node atual (`$json`)
-- Acessar dados de outros nodes (`$('NodeName').item.json`)
-- Manipular strings e arrays
-- Executar lógica JavaScript inline
+- Acessar `$json`
+- Acessar outros nodes `$('Node').item.json`
+- Executar JavaScript inline
+- Manipular datas via `$now`
+- Usar Luxon internamente (DateTime)
 
 ---
 
 # 📊 Tabela Comparativa – Expressões Comuns
 
-| Objetivo | Expressão | Quando Usar | Alternativa Antiga | Recomendação Enterprise |
-|-----------|------------|-------------|---------------------|--------------------------|
-| Fallback de valor | `a || b || "default"` | Garantir valor mínimo | if ternário longo | ✔ Usar operador OR |
-| Concatenar valores | `a + "." + b` | Montar IDs ou nomes | Template string manual | ✔ OK para simples |
-| Último item array | `array.at(-1)` | Pegar último elemento | `array[array.length - 1]` | ✔ Preferir `.at()` |
-| Quebrar string | `split('.')` | Separar extensão | regex complexa | ✔ Usar split simples |
-| Remover não dígitos | `replace(/\D/g, '')` | Normalizar telefone | Loop manual | ✔ Regex eficiente |
-| Executar lógica complexa | IIFE `(() => {...})()` | Condições múltiplas | Code Node | ⚠ Use com moderação |
-| Acessar outro node | `$('Node').item.json.field` | Dependência entre nodes | Copiar manual | ✔ Padrão oficial |
-| Validar existência | `a ? a : b` | Controle explícito | OR simples | ✔ Preferir OR quando possível |
+| Objetivo | Expressão | Recomendação Enterprise |
+|----------|-----------|--------------------------|
+| Fallback | `a || b || "default"` | ✔ Preferir OR |
+| Concatenar simples | `a + " - " + b` | ✔ OK para simples |
+| Concatenação entre nodes | `$('Node').item.json.a + "." + $('Node').item.json.b` | ✔ Usar quando dados vêm de nodes distintos |
+| Último item | `array.at(-1)` | ✔ Preferir `.at()` |
+| Split string | `split('.')` | ✔ Simples e eficiente |
+| Remover não dígitos | `replace(/\D/g, '')` | ✔ Regex padrão |
+| Optional chaining | `obj?.prop` | ✔ Sempre usar |
+| Timestamp ms | `Date.now()` | ✔ IDs internos |
+| Timestamp unix | `Math.floor(Date.now()/1000)` | ✔ APIs |
+| ISO banco | `$now.toISO()` | ✔ Supabase/Postgres |
 
 ---
 
-# 🧠 Snippets Enterprise Padronizados
+# 🧠 Snippets Essenciais
 
 ## 1️⃣ Fallback Seguro
 
@@ -71,7 +74,15 @@ Permitem:
 
 ---
 
-## 2️⃣ Extração de Extensão de Arquivo
+## 2️⃣ Concatenação Avançada Entre Nodes
+
+```handlebars
+{{ $('Webhook1').item.json.body.data.key.id + "." + $('Webhook1').item.json.body.data.message.documentMessage.title.split('.')[1] }}
+```
+
+---
+
+## 3️⃣ Extração de Extensão
 
 ```handlebars
 {{ $json.filename.split('.').at(-1) }}
@@ -79,68 +90,86 @@ Permitem:
 
 ---
 
-## 3️⃣ Normalização de Telefone
+## 4️⃣ Normalização de Telefone
 
 ```handlebars
 {{ $json.phone?.replace(/\D/g, '') || "" }}
 ```
 
-✔ Uso de optional chaining  
-✔ Seguro contra null/undefined
-
 ---
 
-## 4️⃣ Extração Segura de Node Externo
+# 🕒 Datas e Timestamps (Modelo Pareto 80/20)
+
+Você só precisa dominar 3 formatos:
+
+## ✔ ISO (Banco)
 
 ```handlebars
-{{ $('Webhook1').item.json?.body?.data?.id || "ID_INEXISTENTE" }}
+{{ $now.toISO() }}
 ```
 
-✔ Evita erro se campo não existir
+## ✔ Unix (APIs)
+
+```handlebars
+{{ Math.floor(Date.now() / 1000) }}
+```
+
+## ✔ Formatação PT-BR (Usuário Final)
+
+```handlebars
+{{ $now.setLocale('pt-br').toFormat('dd/MM/yyyy HH:mm:ss') }}
+```
 
 ---
 
-# 🛡️ Padrões de Governança Enterprise
+# 🔁 Manipulação em Loop (Dica Sênior)
 
-### ✔ Sempre usar fallback
-Evita quebra de workflow.
+## Timestamp único por item
 
-### ✔ Preferir `.at(-1)`
-Mais legível e moderno.
+```handlebars
+{{ Date.now() + $node["Split In Batches"].context.currentIteration }}
+```
 
-### ✔ Usar optional chaining `?.`
-Previne erro em JSON inconsistente.
+---
 
-### ✔ Documentar expressões críticas
-Colocar comentário no node.
+# 🔄 Conversão Timestamp → Data
 
-### ✔ Evitar lógica complexa inline
-Se passar de 3 operações → use Code Node.
+```handlebars
+{{ DateTime.fromMillis($json.timestamp).setLocale('pt-br').toFormat('dd/MM/yyyy') }}
+```
+
+---
+
+# 🛡️ Governança Enterprise
+
+✔ Sempre usar fallback  
+✔ Sempre usar optional chaining  
+✔ Evitar ternários aninhados  
+✔ Evitar regex excessiva inline  
+✔ Se lógica > 3 operações → usar Code Node  
+✔ Padronizar nomes de nodes  
 
 ---
 
 # 🚨 Anti‑Patterns
 
-❌ Expressões com múltiplos ternários aninhados  
-❌ Regex excessivamente complexa inline  
+❌ Lógica complexa dentro de expressão  
 ❌ Dependência circular entre nodes  
-❌ Falta de fallback em variáveis críticas  
+❌ Falta de fallback  
+❌ Manipulação de datas manualmente sem ISO  
 
 ---
 
-# 📈 Boas Práticas para Times
+# 📈 Modelo Mental Recomendado
 
-- Criar biblioteca interna de snippets
-- Padronizar nomenclatura de nodes
-- Versionar workflows críticos
-- Testar com dados reais antes de produção
-- Documentar fluxos com Mermaid no README
+Expressão n8n deve:
 
----
+1. Ler
+2. Transformar
+3. Garantir fallback
+4. Entregar valor seguro
 
-# 📚 Referência Oficial
-
-- https://docs.n8n.io/code/expressions/
+Se precisar pensar muito → mover para Code Node.
 
 ---
 
@@ -148,3 +177,7 @@ Se passar de 3 operações → use Code Node.
 
 Bruno Pelatieri Goulart  
 Enterprise Automation Architect • AI • DevOps • n8n Specialist
+
+---
+
+© 2026 – Documentação técnica unificada.
