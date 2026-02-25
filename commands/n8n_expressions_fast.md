@@ -45,6 +45,39 @@ Permitem:
 - Manipular datas via `$now`
 - Usar Luxon internamente (DateTime)
 
+### Ex.: No Code node do n8n, a sintaxe correta é:
+
+```javascript
+const userId = $('VarBD').first().json.app_user_id;
+```
+
+Essa sintaxe **já está correta**. Mas para funcionar, o nó `VarBD` precisa estar **conectado ao fluxo** que chega até o Code node, mesmo que não seja o nó imediatamente anterior.
+
+---
+
+Se o nó estiver distante no fluxo e der erro, use:
+
+```javascript
+// Opção 1 — nó pelo nome exato (mais comum)
+const userId = $('VarBD').first().json.app_user_id;
+
+// Opção 2 — se o dado vem do nó imediatamente anterior
+const userId = $input.first().json.app_user_id;
+
+// Opção 3 — pegar todos os itens se for array
+const userId = $('VarBD').all()[0].json.app_user_id;
+```
+
+---
+
+**Ponto mais importante:** o nome dentro de `$('')` deve ser **exatamente igual** ao nome do nó no canvas, incluindo maiúsculas, espaços e acentos.
+
+Por exemplo, se o nó se chama `Var BD` (com espaço):
+```javascript
+const userId = $('Var BD').first().json.app_user_id;
+```
+
+
 ---
 
 # 📊 Tabela Comparativa – Expressões Comuns
