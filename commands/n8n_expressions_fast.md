@@ -206,6 +206,36 @@ Se precisar pensar muito → mover para Code Node.
 
 ---
 
+# 🥶 Use esta abordagem para capturar o body real e debugar erro no code de inserção no supabase:
+
+```js
+
+  try {
+    const raw = await this.helpers.httpRequest({
+      method: 'POST',
+      url: `${SUPABASE_URL}/rest/v1/menus_archives`,
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'return=representation'
+      },
+      body: { menu_id: menuId, file_url: fileUrl },
+      json: true,
+      returnFullResponse: true  // ← retorna status + body completo
+    });
+    console.log('✅ Status:', raw.statusCode);
+    console.log('✅ Body:', JSON.stringify(raw.body));
+  } catch (e) {
+    console.log('❌ menu_id valor:', menuId);
+    console.log('❌ file_url valor:', fileUrl);
+    throw e;
+  }
+
+```
+
+---
+
 # 👤 Autor
 
 Bruno Pelatieri Goulart  
