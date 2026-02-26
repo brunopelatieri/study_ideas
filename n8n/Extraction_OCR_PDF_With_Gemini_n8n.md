@@ -1,29 +1,35 @@
-# 📋 Extração de Cardápios com Gemini no n8n
+# 📋 Extração de PDF com Gemini no n8n
 
-> Base de conhecimento para integração entre **Evolution API**, **n8n** e **Google Gemini** para extração estruturada de dados de cardápios via imagem ou PDF.
+> Base de conhecimento para integração entre **Evolution API**, **n8n** e **Google Gemini** para extração estruturada de dados via imagem ou PDF.
 
 ---
 
 ## 📌 Índice
 
-- [Contexto do Problema](#-contexto-do-problema)
-- [Por que o PDF falha no nó nativo do AI Agent](#-por-que-o-pdf-falha-no-nó-nativo-do-ai-agent)
-- [Solução: HTTP Request direto ao Gemini](#-solução-http-request-direto-ao-gemini)
-- [Fluxo no n8n](#-fluxo-no-n8n)
-- [Nó Code — Limpeza da Base64](#-nó-code--limpeza-da-base64)
-- [Nó HTTP Request — Gemini API](#-nó-http-request--gemini-api)
-- [Nó Code — Extração da Resposta](#-nó-code--extração-da-resposta)
-- [Suporte a Imagens](#-suporte-a-imagens)
-- [Detecção Automática do Tipo de Arquivo](#-detecção-automática-do-tipo-de-arquivo)
-- [Referência de mime_type](#-referência-de-mime_type)
-- [Observações Importantes](#-observações-importantes)
-- [Autor](#-autor)
+- [📋 Extração de PDF com Gemini no n8n](#-extração-de-pdf-com-gemini-no-n8n)
+  - [📌 Índice](#-índice)
+  - [🧩 Contexto do Problema](#-contexto-do-problema)
+    - [O problema com PDF no nó nativo](#o-problema-com-pdf-no-nó-nativo)
+    - [Por que a imagem funciona e o PDF não?](#por-que-a-imagem-funciona-e-o-pdf-não)
+  - [✅ Solução: HTTP Request direto ao Gemini](#-solução-http-request-direto-ao-gemini)
+  - [🔁 Fluxo no n8n](#-fluxo-no-n8n)
+  - [🧹 Nó Code — Limpeza da Base64](#-nó-code--limpeza-da-base64)
+  - [🌐 Nó HTTP Request — Gemini API](#-nó-http-request--gemini-api)
+    - [Configuração do nó](#configuração-do-nó)
+    - [Body da requisição](#body-da-requisição)
+    - [Exemplo com prompt fixo no body](#exemplo-com-prompt-fixo-no-body)
+  - [📦 Nó Code — Extração da Resposta](#-nó-code--extração-da-resposta)
+  - [🖼️ Suporte a Imagens](#️-suporte-a-imagens)
+  - [🔍 Detecção Automática do Tipo de Arquivo](#-detecção-automática-do-tipo-de-arquivo)
+  - [📎 Referência de mime\_type](#-referência-de-mime_type)
+  - [⚠️ Observações Importantes](#️-observações-importantes)
+  - [👤 Autor](#-autor)
 
 ---
 
 ## 🧩 Contexto do Problema
 
-Em automações que recebem **PDFs ou imagens de cardápios** via **Evolution API** (WhatsApp), o arquivo chega em **base64**. O fluxo típico no n8n converte esse base64 para binário e envia ao modelo via **nó nativo de AI Agent**.
+Em automações que recebem **PDFs ou imagens de PDF** via **Evolution API** (WhatsApp), o arquivo chega em **base64**. O fluxo típico no n8n converte esse base64 para binário e envia ao modelo via **nó nativo de AI Agent**.
 
 ### O problema com PDF no nó nativo
 
