@@ -1,6 +1,6 @@
 <img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
 
-# prover de envio de email grátis. Me forneça uma tabela com os melhores inclua o resend
+# provedor de envio de email grátis. Me forneça uma tabela com os melhores inclua o resend
 
 Os melhores provedores gratuitos de envio de email (focando em transacionais para devs, como APIs/SMTP) incluem opções generosas como Brevo e Resend, ideais para automações em n8n ou integrações como Chatwoot.[^1_1][^1_2]
 
