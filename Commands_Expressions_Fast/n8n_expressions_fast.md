@@ -156,17 +156,6 @@ Este código resolve problemas de **quebra de JSON** e **caracteres inválidos**
 
 ---
 
-## 🕒 Referência de Datas e Timestamps
-
-| Objetivo | Expressão JavaScript | Exemplo |
-| --- | --- | --- |
-| **Unix Timestamp (10 dígitos)** | `{{ Math.floor(Date.now() / 1000) }}` | `1741143798` |
-| **JS Timestamp (13 dígitos)** | `{{ Date.now() }}` | `1741143798000` |
-| **Data ISO (Supabase)** | `{{ $now.toISO() }}` | `2026-03-15T...` |
-| **Data PT-BR (WhatsApp)** | `{{ $now.setLocale('pt-br').toFormat('dd/MM/yyyy HH:mm') }}` | `15/03/2026 22:49` |
-
----
-
 # 🕒 Datas e Timestamps (Modelo Pareto 80/20)
 
 Você só precisa dominar 3 formatos:
