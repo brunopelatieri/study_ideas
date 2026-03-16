@@ -131,27 +131,54 @@ const userId = $('Var BD').first().json.app_user_id;
 
 ---
 
+Aqui está o resumo técnico da solução para sua referência futura, focado na sanitização de dados para integração com APIs (como a Evolution API).
+
+---
+
+## 🛠️ Sanitização de String para APIs (n8n & Evolution)
+
+Este código resolve problemas de **quebra de JSON** e **caracteres inválidos** ao enviar mensagens processadas por IAs através de requisições HTTP.
+
+### 📝 A Expressão
+
+```javascript
+{{ $node["When Executed by Another Workflow"].json.text.replace(/["'\\“”‘’]/g, '').replace(/[\r\n]+/g, '\n').split('\n').map(s => s.trim()).filter(s => s) }}
+
+```
+
+### 🔍 O que cada parte faz (Regra de Pareto 80/20)
+
+* **`.replace(/["'\\“”‘’]/g, '')`**: Remove os maiores "vilões" das APIs: aspas simples, duplas, barras invertidas e aspas tipográficas curvas. Isso impede que o JSON da requisição seja malformado.
+* **`.replace(/[\r\n]+/g, '\n')`**: Normaliza quebras de linha múltiplas ou formatos diferentes (`\r\n`) em um único `\n`.
+* **`.split('\n')`**: Transforma o bloco de texto em um **Array**, permitindo processar linha por linha.
+* **`.map(s => s.trim())`**: Remove espaços inúteis no início e no fim de cada frase.
+* **`.filter(s => s)`**: Remove linhas vazias do array final, garantindo que apenas conteúdo útil seja enviado.
+
+---
+
+## 🕒 Referência de Datas e Timestamps
+
+| Objetivo | Expressão JavaScript | Exemplo |
+| --- | --- | --- |
+| **Unix Timestamp (10 dígitos)** | `{{ Math.floor(Date.now() / 1000) }}` | `1741143798` |
+| **JS Timestamp (13 dígitos)** | `{{ Date.now() }}` | `1741143798000` |
+| **Data ISO (Supabase)** | `{{ $now.toISO() }}` | `2026-03-15T...` |
+| **Data PT-BR (WhatsApp)** | `{{ $now.setLocale('pt-br').toFormat('dd/MM/yyyy HH:mm') }}` | `15/03/2026 22:49` |
+
+---
+
 # 🕒 Datas e Timestamps (Modelo Pareto 80/20)
 
 Você só precisa dominar 3 formatos:
 
-## ✔ ISO (Banco)
+## ✔ Referência de Datas e Timestamps
 
-```handlebars
-{{ $now.toISO() }}
-```
-
-## ✔ Unix (APIs)
-
-```handlebars
-{{ Math.floor(Date.now() / 1000) }}
-```
-
-## ✔ Formatação PT-BR (Usuário Final)
-
-```handlebars
-{{ $now.setLocale('pt-br').toFormat('dd/MM/yyyy HH:mm:ss') }}
-```
+| Objetivo | Expressão JavaScript | Exemplo |
+| --- | --- | --- |
+| **Unix Timestamp (10 dígitos)** | `{{ Math.floor(Date.now() / 1000) }}` | `1741143798` |
+| **JS Timestamp (13 dígitos)** | `{{ Date.now() }}` | `1741143798000` |
+| **Data ISO (Supabase)** | `{{ $now.toISO() }}` | `2026-03-15T...` |
+| **Data PT-BR (WhatsApp)** | `{{ $now.setLocale('pt-br').toFormat('dd/MM/yyyy HH:mm') }}` | `15/03/2026 22:49` |
 
 ---
 
