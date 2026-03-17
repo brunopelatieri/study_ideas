@@ -77,7 +77,6 @@ Por exemplo, se o nó se chama `Var BD` (com espaço):
 const userId = $('Var BD').first().json.app_user_id;
 ```
 
-
 ---
 
 # 📊 Tabela Comparativa – Expressões Comuns
@@ -94,6 +93,77 @@ const userId = $('Var BD').first().json.app_user_id;
 | Timestamp ms | `Date.now()` | ✔ IDs internos |
 | Timestamp unix | `Math.floor(Date.now()/1000)` | ✔ APIs |
 | ISO banco | `$now.toISO()` | ✔ Supabase/Postgres |
+
+---
+
+## 📝 Extração de Dígitos e Sanitização
+
+### 1. O Problema Original
+O objetivo era extrair apenas os números de uma string de identificação (provavelmente um WhatsApp ID ou JID) localizada em uma estrutura JSON profunda, garantindo que o código não quebrasse caso o campo estivesse ausente.
+
+**Estrutura do dado:** `$json.body.data.key.remoteJidAlt`
+**Exemplo de entrada:** `"5511999998888@s.whatsapp.net"`
+**Resultado desejado:** `"5511999998888"`
+
+### 2. Análise da Solução Proposta
+A versão otimizada utiliza recursos modernos do JavaScript (ES2020+) para substituir uma função anônima complexa por uma expressão de linha única.
+
+#### **O Código Otimizado**
+```javascript
+$json.body.data.key.remoteJidAlt?.replace(/\D/g, '') ?? ""
+```
+
+### 3. Componentes da Solução (Glossário)
+
+| Componente | Nome | Função |
+| :--- | :--- | :--- |
+| `?.` | **Optional Chaining** | Navega com segurança por objetos. Se `body` ou `data` não existirem, ele retorna `undefined` em vez de causar um erro de sistema. |
+| `.replace()` | **Método String** | Substitui padrões dentro de uma string. |
+| `/\D/g` | **Regex (Regular Expression)** | O padrão buscado. `\D` representa "qualquer caractere que **não** seja número". A flag `g` (global) garante que todos os caracteres sejam removidos, não apenas o primeiro. |
+| `??` | **Nullish Coalescing** | Operador de fallback. Se o resultado da esquerda for `null` ou `undefined`, ele retorna o valor da direita (`""`). |
+
+### 4. Por que usar `\D` em vez de `[0-9]`?
+* `[0-9]` busca números.
+* `\D` busca **o que não é número**.
+* **Lógica:** Para "limpar" uma string e deixar só números, é mais eficiente dizer ao código: *"Pegue tudo que não for dígito e apague"* (substitua por vazio).
+
+### 5. Boas Práticas Identificadas
+1.  **Imutabilidade:** O código não altera o JSON original, apenas extrai o valor formatado.
+2.  **Fail-safe:** O uso de `?? ""` evita que campos obrigatórios em etapas posteriores recebam valores nulos, o que costuma interromper fluxos de automação.
+3.  **Performance:** A remoção da IIFE `(() => { ... })()` reduz o overhead de memória, processando a expressão diretamente.
+
+### 6. A diferença fundamental
+
+* **`||` (OR)**: Retorna o lado direito se o lado esquerdo for **qualquer valor falso** (`false`, `0`, `""`, `null`, `undefined`, `NaN`).
+* **`??` (Nullish)**: Retorna o lado direito **apenas** se o lado esquerdo for `null` ou `undefined`.
+
+### 7. Por que o `??` é mais seguro neste caso?
+
+No seu código de limpeza de números, imagine que o resultado do `.replace()` seja uma string vazia (`""`).
+
+* **Com `|| ""`**: O JavaScript vê a string vazia como "falsa" e tenta aplicar o fallback. No seu caso, o fallback também é `""`, então o resultado é o mesmo. Mas se o seu fallback fosse `"Não encontrado"`, o `||` substituiria uma string vazia (que é um resultado válido de limpeza) por `"Não encontrado"`.
+* **Com `?? ""`**: Ele só aplicaria o fallback se o campo nem existisse. Se o campo existir mas não tiver números (resultado `""`), ele mantém a string vazia.
+
+### 8. Tabela Comparativa de Comportamento
+
+| Valor à Esquerda | Resultado com `|| "Padrão"` | Resultado com `?? "Padrão"` |
+| :--- | :--- | :--- |
+| `null` | `"Padrão"` | `"Padrão"` |
+| `undefined` | `"Padrão"` | `"Padrão"` |
+| `""` (String vazia) | **`"Padrão"`** | `""` |
+| `0` | **`"Padrão"`** | `0` |
+| `false` | **`"Padrão"`** | `false` |
+
+### Resumo para sua pesquisa:
+Use **`||`** quando você quer que **qualquer valor "vazio" ou "zero"** seja substituído.
+Use **`??`** quando você quer apenas se prevenir contra **dados ausentes (nulos ou indefinidos)**, preservando strings vazias ou o número zero.
+
+No contexto de automação (como o código que você enviou), o **`??`** é considerado a "boa prática moderna" porque é mais específico e evita substituições indesejadas em valores que são tecnicamente válidos, mas "falsos" para o JavaScript.
+
+---
+
+### Exemplo de Aplicação Prática
+Se o campo contiver `"ID: 99-abc-123"`, o código retornará `"99123"`.
 
 ---
 
@@ -128,10 +198,6 @@ const userId = $('Var BD').first().json.app_user_id;
 ```handlebars
 {{ $json.phone?.replace(/\D/g, '') || "" }}
 ```
-
----
-
-Aqui está o resumo técnico da solução para sua referência futura, focado na sanitização de dados para integração com APIs (como a Evolution API).
 
 ---
 
