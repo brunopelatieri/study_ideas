@@ -222,6 +222,41 @@ Este código resolve problemas de **quebra de JSON** e **caracteres inválidos**
 
 ---
 
+## 📱 Extração de Dígitos Finais (Sanitização de Telefone)
+
+Esta expressão serve para isolar a parte invariável de um número de telefone, ignorando DDI (55), DDD e caracteres especiais.
+
+### 📝 A Expressão
+```javascript
+{{ $json.whatsapp.replace(/\D/g, '').slice(-8) }}
+```
+
+### 🔍 Decomposição Técnica (Regra de Pareto 80/20)
+
+1.  **`$json.whatsapp`**: Acessa o valor do campo vindo do nó anterior.
+2.  **`.replace(/\D/g, '')`**: 
+    * **`\D`**: Regex que significa "qualquer caractere que **NÃO** seja um dígito".
+    * **`g`**: Flag global (substitui todos, não apenas o primeiro).
+    * **`''`**: Substitui por nada.
+    * *Resultado:* Transforma `+55 (19) 99249-6598` em `5519992496598`.
+3.  **`.slice(-8)`**: 
+    * O método `slice` corta a string. 
+    * O valor **negativo** faz a contagem começar do **final para o início**.
+    * *Resultado:* Pega apenas os últimos 8 números (`2496598`), ignorando se o número tem o "9" adicional, DDD ou DDI.
+
+---
+
+### ⚠️ Por que usar os últimos 8 dígitos?
+
+* **Evita o erro do "9" Digito:** No Brasil, alguns sistemas enviam com o 9 na frente e outros não. Os últimos 8 dígitos são sempre os mesmos.
+* **Independência de Formato:** Não importa se o usuário digitou com espaços, traços ou parênteses; a regex `\D` limpa tudo.
+* **Busca no Banco:** É muito mais seguro buscar no **Supabase** usando os últimos 8 dígitos (operador `LIKE %valor`) do que tentar bater o número completo, que pode variar entre `55`, `055`, ou sem DDI.
+
+### Dica Sênior para o Erro de Importação
+Se você for usar essa expressão em um novo nó e o n8n der o erro *"Could not find property option"*, lembre-se: crie um nó **Set** ou **Edit Fields** do zero e cole apenas a expressão acima. Não tente importar o nó de outro workflow via arquivo JSON.
+
+---
+
 # 🕒 Datas e Timestamps (Modelo Pareto 80/20)
 
 Você só precisa dominar 3 formatos:
