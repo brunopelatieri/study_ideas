@@ -259,9 +259,38 @@ Se você for usar essa expressão em um novo nó e o n8n der o erro *"Could not 
 
 # 🕒 Datas e Timestamps (Modelo Pareto 80/20)
 
-Você só precisa dominar 3 formatos:
+Para inserir esse timestamp no **Supabase**, você precisa primeiro identificar qual é o tipo de dado da sua coluna no banco. O número `1773963828` é um **Unix Timestamp em segundos** (referente a abril de 2026).
 
-## ✔ Referência de Datas e Timestamps
+Aqui estão as duas formas de ajustar isso via JavaScript no nó **Code** do n8n:
+
+### 1. Se a coluna for `timestamp` ou `timestamptz` (Recomendado)
+O Supabase (PostgreSQL) prefere o formato ISO8601. Você deve converter os segundos em milissegundos e gerar a string de data.
+
+```javascript
+const unixSegundos = 1773963828;
+const dataISO = new Date(unixSegundos * 1000).toISOString();
+
+return {
+  json: {
+    data_para_supabase: dataISO // Resultado: "2026-04-22T23:43:48.000Z"
+  }
+};
+```
+
+### 2. Se a coluna for `int8` ou `numeric`
+Se você definiu a coluna como um número inteiro para economizar processamento, não precisa de ajuste de formato, apenas garanta que o JavaScript trate como número:
+
+```javascript
+return {
+  json: {
+    data_para_supabase: Number(1773963828)
+  }
+};
+```
+
+### 🕒 Resumo Técnico: Datas e Timestamps (Pareto 80/20)
+
+Você só precisa dominar 3 formatos:
 
 | Objetivo | Expressão JavaScript | Exemplo |
 | --- | --- | --- |
@@ -269,6 +298,7 @@ Você só precisa dominar 3 formatos:
 | **JS Timestamp (13 dígitos)** | `{{ Date.now() }}` | `1741143798000` |
 | **Data ISO (Supabase)** | `{{ $now.toISO() }}` | `2026-03-15T...` |
 | **Data PT-BR (WhatsApp)** | `{{ $now.setLocale('pt-br').toFormat('dd/MM/yyyy HH:mm') }}` | `15/03/2026 22:49` |
+| **Unix para ISO (Banco)** | `new Date(ts * 1000).toISOString()` | `2026-04-22T23:43:48Z` |
 
 ---
 
