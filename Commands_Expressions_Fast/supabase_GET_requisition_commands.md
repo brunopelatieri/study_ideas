@@ -60,6 +60,86 @@ Controlam **o que** e **como** os dados retornam.
 
 ---
 
+### 4.1 Complementando: Seleção e Joins (O "Coração" do GET)
+Esta seção controla a estrutura do JSON que o n8n recebe.
+É importante lembrar o "padrão Supabase": o PostgREST (a engine por trás da API) não usa as palavras `LEFT` ou `RIGHT` explicitamente na URL. Ele define o tipo de Join através de operadores como `!inner` ou pela **ordem** em que você chama as tabelas.
+
+
+| Parâmetro / Operador | Tipo de Join | Função | Exemplo na URL |
+| :--- | :--- | :--- | :--- |
+| `select` | **Projeção** | Escolher colunas específicas | `?select=id,nome` |
+| **Padrão** (sem sufixo) | **LEFT JOIN** | Traz a principal + a relacionada (se houver). Se não houver relação, a principal continua na lista. | `?select=*,tabela_rel(*)` |
+| `!inner` | **INNER JOIN** | **Filtra o resultado.** Só traz o registro se ele existir em AMBAS as tabelas. | `?select=*,tabela_rel!inner(*)` |
+| **Inversão de URL** | **RIGHT JOIN** | No Supabase, para fazer um Right Join, você inverte a tabela principal na URL. | `https://.../tabela_B?select=*,tabela_A(*)` |
+| `count` | **Agregação** | Retorna o total de linhas (head, exact, planned). | `?select=id&count=exact` |
+| `Resource?select=...` | **Nested Limit** | Limita quantos registros da tabela relacionada aparecem. | `?select=*,rel(coluna)&rel.limit=1` |
+
+---
+
+### 🔍 Diferença Visual
+
+Para não errar na lógica do seu robô, entenda como o banco se comporta:
+
+*   **Left Join (Padrão):** "Quero todos os **Agendamentos**, e se o **Expert** existir, me mostre o nome dele." (Se o Expert for deletado, o agendamento ainda aparece).
+*   **Inner Join (`!inner`):** "Quero apenas os **Agendamentos** que tenham um **Expert** válido vinculado." (Se o agendamento não tiver Expert, ele some da lista).
+*   **Filtro no Join:** Quando você usa `!inner`, você pode filtrar a tabela principal baseada em uma coluna da relacionada:
+    `?select=*,rob_set!inner(*)&rob_set.active=eq.true`
+
+---
+
+### 🕒 Resumo Técnico: Dica de Performance
+
+Ao trabalhar com Joins no n8n:
+1.  **Evite o `*` no Join:** Se a tabela relacionada tiver muitas colunas, sua requisição ficará lenta. Use `tabela(coluna1,coluna2)`.
+2.  **Alias no Join:** Você pode renomear a tabela relacionada para facilitar o uso no n8n:
+    `?select=minutos,detalhes:rob_set!inner(activity_name)`
+    *No n8n você acessaria como: `{{ $json.detalhes.activity_name }}`*
+
+Exemplo que separa os amadores dos profissionais.
+
+Imagine o seguinte cenário: você precisa buscar agendamentos que aconteçam **HOJE** (Sábado, dia 6) **OU** que tenham sido marcados como **URGENTES** (priority = 1), mas apenas se o **Expert** vinculado estiver **Ativo**.
+
+### 🛠️ A URL "Master" (Inner Join + OR + Datas)
+
+Aqui está a construção técnica dessa query:
+
+```text
+https://YOUR_PROJECT_ID.supabase.co/rest/v1/rob_set_schedule?select=minutes,day_week,rob_set!inner(activity_name,active)&or=(day_week.eq.{{ $now.weekday }},priority.eq.1)&rob_set.active=eq.true&order=minutes.asc
+```
+
+---
+
+### 🔍 O que está acontecendo "sob o capô"?
+
+1.  **`rob_set!inner(activity_name,active)`**: Faz o **Inner Join**. Se o agendamento não tiver uma atividade vinculada, ele nem aparece no n8n.
+2.  **`or=(day_week.eq.6,priority.eq.1)`**: Aqui está a mágica. Ele traz o que é de hoje (Sábado = 6) **OU** o que é prioridade, independentemente do dia.
+3.  **`&rob_set.active=eq.true`**: Um filtro extra na tabela relacionada. Só queremos especialistas que estão "on".
+4.  **`order=minutes.desc`**: Ordena pelos agendamentos mais longos primeiro.
+
+---
+
+### 🕒 Resumo Técnico: Comparação de Estruturas (Pareto 80/20)
+
+Para você nunca mais ter dúvida na hora de montar o seu nó HTTP:
+
+| Tipo de Filtro | Sintaxe PostgREST | Quando usar no DiretorIA? |
+| :--- | :--- | :--- |
+| **Filtro Simples** | `&coluna=eq.valor` | Status, IDs, Booleans. |
+| **Filtro no Join** | `&tabela_rel.coluna=eq.X` | Quando a regra depende do "Pai" (ex: Expert ativo). |
+| **Filtro de Data** | `&data=gte.{{ $now.toISO() }}` | Para pegar tudo de "agora em diante". |
+| **Filtro de Lista** | `&id=in.(1,2,3)` | Quando você tem vários IDs vindos de um nó anterior. |
+
+---
+
+### ⚠️ Dica de Sênior: O "Nó de Segurança" no n8n
+
+Sempre que você fizer uma query complexa assim, o n8n pode receber um array vazio `[]` se nada for encontrado. Para o seu fluxo não "quebrar" ou dar erro na Evolution API, coloque um nó **Filter** ou **If** logo após o HTTP Request:
+
+*   **Condição:** `{{ $json.length }}` > `0`
+*   **Ação:** Se TRUE, segue para o WhatsApp. Se FALSE, termina o fluxo silenciosamente (ou loga um aviso).
+
+---
+
 ### 🛠️ A Sintaxe Correta
 
 **Como você escreveu:** `valor=neq.(whatsapp,assistent)` ❌
@@ -165,3 +245,13 @@ Se você quiser que o seu robô verifique se uma mensagem está "parada" há mai
 `?created_at=lt.{{ $now.minus({ minutes: 10 }).toISO() }}&status=eq.pendente`
 
 ---
+
+# 👤 Autor
+
+Bruno Pelatieri Goulart  
+Enterprise AI Workflow Architect  
+LLM Orchestration • Deterministic Automation • n8n Systems
+
+---
+
+© 2026 – Documentação técnica unificada.

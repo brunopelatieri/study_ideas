@@ -261,8 +261,12 @@ This architecture converts LLM behavior from probabilistic text generation into 
 
 ---
 
-# 👤 Author
+# 👤 Autor
 
 Bruno Pelatieri Goulart  
 Enterprise AI Workflow Architect  
 LLM Orchestration • Deterministic Automation • n8n Systems
+
+---
+
+© 2026 – Documentação técnica unificada.
