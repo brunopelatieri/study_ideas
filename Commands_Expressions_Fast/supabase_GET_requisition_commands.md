@@ -122,7 +122,7 @@ https://YOUR_PROJECT_ID.supabase.co/rest/v1/rob_set_schedule?select=minutes,day_
 
 Para você nunca mais ter dúvida na hora de montar o seu nó HTTP:
 
-| Tipo de Filtro | Sintaxe PostgREST | Quando usar no DiretorIA? |
+| Tipo de Filtro | Sintaxe PostgREST | Quando usar? |
 | :--- | :--- | :--- |
 | **Filtro Simples** | `&coluna=eq.valor` | Status, IDs, Booleans. |
 | **Filtro no Join** | `&tabela_rel.coluna=eq.X` | Quando a regra depende do "Pai" (ex: Expert ativo). |
