@@ -68,4 +68,14 @@ Para evitar o erro **[ERROR: Reference]**, nunca use `$json` puro se o dado vier
     ```
 
 ---
+
 **Dica Final:** Sempre execute o nó de origem (`VarBD`) antes de configurar o `HTTP Request`. Isso faz com que os nomes dos campos apareçam na aba **Nodes**, facilitando o arraste sem erros.
+
+---
+
+# 👤 Autor
+
+Bruno Pelatieri Goulart  
+Enterprise Automation Architect • AI • DevOps • n8n Specialist
+
+---
