@@ -1,7 +1,3 @@
-Aqui está a sua "Folha de Colas" (Cheat Sheet) definitiva para operadores do Supabase (PostgREST) via requisições GET. Esta lista foi otimizada para consulta rápida no desenvolvimento.
-
----
-
 ## 🚀 Guia de Operadores Supabase (GET / PostgREST)
 
 ### 1. Operadores de Comparação Básica
